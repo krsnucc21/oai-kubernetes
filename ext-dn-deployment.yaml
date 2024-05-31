@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-ext-dn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-ext-dn
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: oai-traffic-network
+      labels:
+        app: oai-ext-dn
+    spec:
+      containers:
+        - name: oai-ext-dn
+          image: oaisoftwarealliance/trf-gen-cn5g:focal
+          securityContext:
+            privileged: true
+          env:
+          - name: OAI_UPF_SERVICE_HOST
+            value: "oai-upf"
+          command: ["/bin/bash", "-c"]
+          args: ["iptables -t nat -A POSTROUTING -o net1 -j MASQUERADE; ip route add 12.1.1.0/24 via $(getent hosts $OAI_UPF_SERVICE_HOST | awk '{ print $1 }') dev net1; sleep infinity"]

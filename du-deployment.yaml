@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-du
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-du
+  template:
+    metadata:
+      labels:
+        app: oai-du
+    spec:
+      serviceAccountName: config-updater-sa
+      initContainers:
+      - name: config-updater
+        image: krsnucc21/config-updater
+        env:
+        - name: NODE_TYPE
+          value: "du"
+        - name: IP_CONFIGMAP_NAME
+          value: "oai-ip-config"
+        - name: CONFIGMAP_NAMESPACE
+          value: "default"
+        - name: GNB_CONFIGMAP_NAME
+          value: "du-config"
+      containers:
+      - name: oai-du
+        image: oaisoftwarealliance/oai-gnb:develop
+        securityContext:
+          privileged: true
+        env:
+        - name: DU_IP
+          valueFrom:
+            configMapKeyRef:
+              name: oai-ip-config
+              key: du-ip
+        - name: USE_ADDITIONAL_OPTIONS
+          value: "--sa --rfsim --log_config.global_log_options level,nocolor,time --rfsimulator.options chanmod --telnetsrv --telnetsrv.listenaddr $(DU_IP)"
+        - name: ASAN_OPTIONS
+          value: "detect_leaks=0"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/oai-gnb/etc/gnb.conf
+          subPath: gnb.conf
+        - name: rfsim-volume
+          mountPath: /opt/oai-gnb/etc/rfsim_channel_ci.conf
+      volumes:
+      - name: config-volume
+        configMap:
+          name: du-config
+      - name: rfsim-volume
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oai-du
+spec:
+  clusterIP: None
+  selector:
+    app: oai-du
+  ports:
+  - name: telnetsrv
+    port: 23
+    targetPort: 23
+    protocol: TCP
+  - name: f1-control
+    port: 500
+    targetPort: 500
+    protocol: SCTP
+  - name: f1-data
+    port: 2153
+    targetPort: 2153
+    protocol: UDP

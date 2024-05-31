@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-smf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-smf
+  template:
+    metadata:
+      labels:
+        app: oai-smf
+    spec:
+      containers:
+        - name: oai-smf
+          image: oaisoftwarealliance/oai-smf:v2.0.0
+          env:
+            - name: TZ
+              value: Europe/Paris
+          volumeMounts:
+            - mountPath: /openair-smf/etc/config.yaml
+              name: config
+              subPath: mini_nonrf_config_3slices.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: smf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oai-smf
+spec:
+  clusterIP: None
+  selector:
+    app: oai-smf
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: v1
+    - protocol: TCP
+      port: 8805
+      targetPort: 8805
+      name: n4

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-cu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-cu
+  template:
+    metadata:
+      labels:
+        app: oai-cu
+    spec:
+      serviceAccountName: config-updater-sa
+      initContainers:
+      - name: config-updater
+        image: krsnucc21/config-updater
+        env:
+        - name: NODE_TYPE
+          value: "cu"
+        - name: IP_CONFIGMAP_NAME
+          value: "oai-ip-config"
+        - name: CONFIGMAP_NAMESPACE
+          value: "default"
+        - name: GNB_CONFIGMAP_NAME
+          value: "cu-config"
+      containers:
+      - name: oai-cu
+        image: oaisoftwarealliance/oai-gnb:develop
+        securityContext:
+          privileged: true
+        env:
+        - name: USE_ADDITIONAL_OPTIONS
+          value: "--sa --log_config.global_log_options level,nocolor,time"
+        - name: ASAN_OPTIONS
+          value: "detect_leaks=0"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/oai-gnb/etc/gnb.conf
+          subPath: gnb.conf
+      volumes:
+      - name: config-volume
+        configMap:
+          name: cu-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oai-cu
+spec:
+  clusterIP: None
+  selector:
+    app: oai-cu
+  ports:
+  - name: s1u
+    port: 2152
+    targetPort: 2152
+    protocol: UDP
+  - name: f1-c
+    port: 501
+    targetPort: 501
+    protocol: SCTP
+  - name: f1-u
+    port: 2153
+    targetPort: 2153
+    protocol: UDP

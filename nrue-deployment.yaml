@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-nr-ue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-nr-ue
+  template:
+    metadata:
+      labels:
+        app: oai-nr-ue
+    spec:
+      containers:
+      - name: oai-nr-ue
+        image: oaisoftwarealliance/oai-nr-ue:develop
+        securityContext:
+          privileged: true
+        env:
+        - name: DU_IP
+          valueFrom:
+            configMapKeyRef:
+              name: oai-ip-config
+              key: du-ip
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: USE_ADDITIONAL_OPTIONS
+          value: "--sa --rfsim --log_config.global_log_options level,nocolor,time -r 106 --numerology 1 -C 3619200000 --uicc0.imsi 208990100001100 --rfsimulator.serveraddr $(DU_IP) --rfsimulator.options chanmod --telnetsrv --telnetsrv.shrmod ciUE --telnetsrv.listenaddr $(POD_IP) --telnetsrv.listenport 8091"
+        volumeMounts:
+        - name: nrue-config
+          mountPath: /opt/oai-nr-ue/etc/nr-ue.conf
+          subPath: nr-ue.conf
+        - name: rfsim-config
+          mountPath: /opt/oai-nr-ue/etc/rfsim_channel_ci.conf
+      volumes:
+      - name: nrue-config
+        configMap:
+          name: nrue-config
+      - name: rfsim-config
+        emptyDir: {}

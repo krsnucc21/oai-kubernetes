@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-upf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-upf
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: oai-traffic-network
+      labels:
+        app: oai-upf
+    spec:
+      containers:
+        - name: oai-upf
+          image: oaisoftwarealliance/oai-upf:v2.0.0
+          env:
+            - name: TZ
+              value: Europe/Paris
+          volumeMounts:
+            - mountPath: /openair-upf/etc/config.yaml
+              name: config
+              subPath: mini_nonrf_config_3slices.yaml
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN", "SYS_ADMIN"]
+              drop: ["ALL"]
+            privileged: true
+      volumes:
+        - name: config
+          configMap:
+            name: upf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oai-upf
+spec:
+  clusterIP: None
+  selector:
+    app: oai-upf
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: sbi
+    - protocol: UDP
+      port: 2152
+      targetPort: 2152
+      name: n3-n9
+    - protocol: TCP
+      port: 8805
+      targetPort: 8805
+      name: n4

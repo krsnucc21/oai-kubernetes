@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-amf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-amf
+  template:
+    metadata:
+      labels:
+        app: oai-amf
+    spec:
+      containers:
+        - name: oai-amf
+          image: oaisoftwarealliance/oai-amf:v2.0.0
+          env:
+            - name: TZ
+              value: Europe/Paris
+          volumeMounts:
+            - mountPath: /openair-amf/etc/config.yaml
+              name: config
+              subPath: mini_nonrf_config_3slices.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: amf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oai-amf
+spec:
+  clusterIP: None
+  selector:
+    app: oai-amf
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: v1
+    - protocol: SCTP
+      port: 38412
+      targetPort: 38412
+      name: n2

@@ -1,0 +1,4 @@
+docker login
+docker build -t krsnucc21/config-updater .
+docker images
+docker push krsnucc21/config-updater

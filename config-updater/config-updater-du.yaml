@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-ip-du
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oai-ip-du
+  template:
+    metadata:
+      labels:
+        app: oai-ip-du
+    spec:
+      serviceAccountName: config-updater-sa
+      containers:
+      - name: oai-ip-du
+        image: krsnucc21/config-updater
+        env:
+        - name: NODE_TYPE
+          value: "du" # Set this to "cu" for the cu pod
+        - name: IP_CONFIGMAP_NAME
+          value: "oai-ip-config"
+        - name: GNB_CONFIGMAP_NAME
+          value: "du-config" # Set this to "cu" for the cu pod
+        - name: CONFIGMAP_NAMESPACE
+          value: "default" # Change if your ConfigMap is in a different namespace

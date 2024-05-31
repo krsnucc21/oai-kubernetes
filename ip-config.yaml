@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oai-ip-config
+data:
+  cu-ip: ""
+  du-ip: ""
