@@ -11,6 +11,10 @@ kubectl delete configmap cu-config
 kubectl delete configmap du-config
 kubectl delete -f ip-config.yaml
 
+kubectl delete -f configmap-rolebinding.yaml
+kubectl delete -f configmap-role.yaml
+kubectl delete -f configmap-serviceaccount.yaml
+
 echo "kubectl get network-attachment-definitions"
 kubectl get network-attachment-definitions
 echo "kubectl get configmaps"
