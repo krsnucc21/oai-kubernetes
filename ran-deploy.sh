@@ -1,8 +1,8 @@
 #!/bin/bash
 
-kubectl apply -f ../configmap-serviceaccount.yaml
-kubectl apply -f ../configmap-role.yaml
-kubectl apply -f ../configmap-rolebinding.yaml
+kubectl apply -f configmap-serviceaccount.yaml
+kubectl apply -f configmap-role.yaml
+kubectl apply -f configmap-rolebinding.yaml
 
 kubectl create configmap cu-config --from-file=gnb.conf=./gnb-cu.sa.band78.106prb.conf
 kubectl describe configmap cu-config | grep OAI-CU
