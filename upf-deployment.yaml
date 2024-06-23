@@ -9,8 +9,8 @@ spec:
       app: oai-upf
   template:
     metadata:
-      annotations:
-        k8s.v1.cni.cncf.io/networks: oai-traffic-network
+      #annotations:
+        #k8s.v1.cni.cncf.io/networks: oai-traffic-network
       labels:
         app: oai-upf
     spec:
