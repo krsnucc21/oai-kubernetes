@@ -1,6 +1,6 @@
 #!/bin/bash
 
-kubectl delete -f ext-dn-deployment.yaml
+#kubectl delete -f ext-dn-deployment.yaml
 
 kubectl delete -f smf-deployment.yaml
 kubectl delete configmap smf-config
