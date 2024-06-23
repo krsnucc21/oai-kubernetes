@@ -35,8 +35,8 @@ display_logs() {
 kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
 kubectl get daemonsets.apps -n kube-system
 
-kubectl apply -f network-attachment.yaml
-kubectl describe network-attachment-definitions
+#kubectl apply -f network-attachment.yaml
+#kubectl describe network-attachment-definitions
 
 kubectl create configmap mysql-config --from-file=./oai_db.sql --from-file=./mysql-healthcheck.sh
 kubectl apply -f mysql-deployment.yaml
