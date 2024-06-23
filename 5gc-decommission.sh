@@ -14,7 +14,7 @@ kubectl delete configmap amf-config
 kubectl delete -f mysql-deployment.yaml
 kubectl delete configmap mysql-config
 
-kubectl delete -f network-attachment.yaml
+#kubectl delete -f network-attachment.yaml
 
 echo "kubectl get network-attachment-definitions"
 kubectl get network-attachment-definitions
