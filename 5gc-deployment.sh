@@ -81,14 +81,14 @@ else
   echo "smf pod with prefix 'oai-smf' not found."
 fi
 
-kubectl apply -f ext-dn-deployment.yaml
+#kubectl apply -f ext-dn-deployment.yaml
 
-ext_dn_pod=$(get_pod_name "oai-ext-dn")
-if [ -n "$ext_dn_pod" ]; then
-  wait_for_pod "$ext_dn_pod"
-else
-  echo "smf pod with prefix 'oai-ext-dn' not found."
-fi
+#ext_dn_pod=$(get_pod_name "oai-ext-dn")
+#if [ -n "$ext_dn_pod" ]; then
+  #wait_for_pod "$ext_dn_pod"
+#else
+  #echo "smf pod with prefix 'oai-ext-dn' not found."
+#fi
 
 sleep 10
 
@@ -111,8 +111,8 @@ if [ -n "$smf_pod" ]; then
   display_logs "$smf_pod" | tail
 fi
 
-if [ -n "$ext_dn_pod" ]; then
-  display_logs "$ext_dn_pod" | tail
-fi
+#if [ -n "$ext_dn_pod" ]; then
+  #display_logs "$ext_dn_pod" | tail
+#fi
 
 kubectl get pods -o wide
